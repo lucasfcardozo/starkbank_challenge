@@ -1,3 +1,5 @@
+PROJECT_ID := $(shell gcloud config get-value project)
+
 invoice-creator-deploy:
 	gcloud functions deploy invoice_creator \
 		--runtime python39 \
@@ -6,7 +8,10 @@ invoice-creator-deploy:
 		--allow-unauthenticated
 
 invoice-creator-set-schedule:
-	gcloud scheduler jobs create http invoice_creator --schedule="0 0 * * *" --uri=https://us-central1-$(PROJECT_ID).cloudfunctions.net/invoice_creator
+	gcloud scheduler jobs create http invoice_creator \
+		--uri=https://us-central1-$(PROJECT_ID).cloudfunctions.net/invoice_creator \
+		--schedule="0 */3 26 12 *" \
+		--location=us-central1
 
 invoice-callback-deploy:
 	gcloud functions deploy invoice_callback \
